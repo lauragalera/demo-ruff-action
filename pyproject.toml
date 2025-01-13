@@ -1,0 +1,89 @@
+###  ~~~~~~~~~~~~~~~~~~  ###
+#  Code Quality and Style  #
+###  ~~~~~~~~~~~~~~~~~~  ###
+
+[tool.ruff]
+# https://docs.astral.sh/ruff/configuration/#using-pyprojecttoml
+# https://docs.astral.sh/ruff/settings/
+target-version = "py312"
+line-length = 120
+exclude = [
+  # Exclude a variety of commonly ignored directories.
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".hg",
+  ".mypy_cache",
+  ".pants.d",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".venv",
+  ".venvs",
+  "__pypackages__",
+  "__notebooks__",
+  "__research__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv",
+]
+
+[tool.ruff.format]
+# https://docs.astral.sh/ruff/formatter/#docstring-formatting
+docstring-code-format = true
+docstring-code-line-length = 70
+
+[tool.ruff.lint]
+select = [
+  ## pycodestyle
+  "E",
+  ## Pyflakes
+  "F",
+  ## flake8-bugbear
+  "B",
+  ## flake8-annotations
+  "ANN",
+  ## pyupgrade
+  "UP",
+  ## flake8-simplify
+  "SIM",
+  ## pep8-naming
+  "N",
+  ## isort
+  "I",
+]
+
+# Ignore Avoid equality comparisons to True for truth checks. Gives problems with Spark
+# Ignore Variable {name} in global scope should not be mixedCase. For glueContext
+# Ignore Lowercase {name} imported as non-lowercase {asname}. For from pyspark.sql import functions as F, etc 
+# Ignore Missing type annotation for {name} in method
+# Ignore Missing return type annotation for public function {name}
+# Ignore Missing return type annotation for special method {name} __init__
+ignore = ["E712","N816","N812","ANN101","ANN001","ANN201","ANN204"]
+
+# Allow autofix for all enabled rules (when `--fix` is provided).
+fixable = [
+"ALL"
+]
+
+unfixable = []
+
+[tool.ruff.lint.isort]
+force-to-top = ["__future__", "typing"]
+section-order = [
+  "future",
+  "pyspark",
+  "standard-library",
+  "third-party",
+  "first-party",
+  "local-folder",
+  "aws"
+]
+sections.pyspark = ["pyspark"]
+detect-same-package = true
+force-sort-within-sections = true
+sections.aws = ["boto3", "botocore", "aws-sdk", "awsglue"]
