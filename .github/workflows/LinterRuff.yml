@@ -5,7 +5,7 @@ on:
       - main
     types: [opened, reopened, synchronize]
     paths:
-      - "scripts/dev/**"
+      - "scripts/**"
 
 jobs:
   lint:
