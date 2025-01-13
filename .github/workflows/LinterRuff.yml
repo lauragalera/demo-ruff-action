@@ -1,0 +1,81 @@
+name: ruff-action
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, synchronize]
+    paths:
+      - "scripts/dev/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check out Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Format code
+        uses: astral-sh/ruff-action@v3.0.0
+        with:
+          args: "format"
+          src: "scripts/"
+        continue-on-error: true
+        
+
+      - name: Commit format changes (if any)
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Apply Ruff formatting" || exit 0
+          git push origin HEAD:${{ github.head_ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check code
+        uses: astral-sh/ruff-action@v3.0.0
+        with:
+          args: "check --fix --output-file ruff_check_output.txt --output-format full"
+          src: "scripts/"
+        continue-on-error: true  
+
+      - name: Commit fixed lint errors (if any)
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add . ':!ruff_check_output.txt'
+          git commit -m "Apply Ruff lint fixes" || exit 0
+          git push origin HEAD:${{ github.head_ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📬 Add output to PR
+        run: |
+          echo "#### Ruff Linter" > ruff_output.txt
+
+          # Add format output
+          echo "<details><summary>Not fixable checks</summary>" >> ruff_output.txt
+          echo "" >> ruff_output.txt
+          echo '```' >> ruff_output.txt
+          cat ruff_check_output.txt >> ruff_output.txt
+          echo '```' >> ruff_output.txt
+          echo "" >> ruff_output.txt
+          echo "</details>" >> ruff_output.txt
+
+          # Truncate if file size exceeds 65k characters
+          file_size=$(wc -m <ruff_output.txt)         
+          if [ "$file_size" -gt 65000 ]; then
+            head -c 65000 ruff_output.txt > temp_ruff_output.txt
+            mv temp_ruff_output.txt ruff_output.txt
+          fi
+          
+          # Post the comment with the output
+          gh issue comment ${{ github.event.number }} --body-file ruff_output.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
