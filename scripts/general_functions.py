@@ -36,8 +36,8 @@ def flatten_struct(schema, prefix=""):
 
     """
 
-    from pyspark.sql.types import StructType
     from pyspark.sql.functions import col
+    from pyspark.sql.types import StructType
 
     result = []
     for elem in schema:
