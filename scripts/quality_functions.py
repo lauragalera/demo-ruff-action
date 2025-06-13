@@ -36,7 +36,7 @@ def check_data_types(df, dictionary_selected, ignore=None):
     - ignore: variables to ignore in this test (ex: ignore = ("var1", "var2")); default None
 
     output:
-    - List with all variable that do not match with the input dictionary
+    - List with all variable that do not match with the input dictionary teeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeest
     """
 
     if ignore != None:
